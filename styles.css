@@ -45,3 +45,8 @@ button:hover { filter: brightness(1.1); }
 .task .title { flex: 1; }
 .task.done .title { text-decoration: line-through; color: var(--muted); }
 .delete-btn { background: transparent; color: var(--danger); padding: .25rem .5rem; font-size: 1.1rem; }
+
+/* Launch readiness */
+.progress { height: 14px; background: #0b1222; border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--done)); transition: width .3s ease; }
+#progress-label.ready { color: var(--done); font-weight: 600; }

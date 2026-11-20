@@ -5,6 +5,8 @@ const form = document.getElementById("task-form");
 const input = document.getElementById("task-input");
 const list = document.getElementById("task-list");
 const emptyState = document.getElementById("empty-state");
+const progressFill = document.getElementById("progress-fill");
+const progressLabel = document.getElementById("progress-label");
 
 let tasks = loadTasks();
 
@@ -42,6 +44,18 @@ function deleteTask(id) {
   render();
 }
 
+function renderProgress() {
+  const total = tasks.length;
+  const done = tasks.filter(t => t.done).length;
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  progressFill.style.width = pct + "%";
+  const ready = total > 0 && done === total;
+  progressLabel.textContent = ready
+    ? "100% ready - you're cleared for launch! 🚀"
+    : `${pct}% ready (${done} of ${total} tasks done)`;
+  progressLabel.classList.toggle("ready", ready);
+}
+
 function render() {
   list.innerHTML = "";
   tasks.forEach(task => {
@@ -67,6 +81,7 @@ function render() {
     list.appendChild(li);
   });
   emptyState.hidden = tasks.length > 0;
+  renderProgress();
 }
 
 form.addEventListener("submit", e => {
