@@ -12,6 +12,14 @@ group chats and docs. Things slip, and nobody knows how close the team actually 
 One page that tracks every launch task, shows a live readiness score, and lets the team
 filter by area (Product, Marketing, Legal, Ops).
 
+## Features
+- Add, complete, rename (double-click) and delete launch tasks
+- Tag tasks by area: Product, Marketing, Legal, Ops, and filter by tag
+- Due dates, with overdue and due-today highlighting; unfinished and soonest tasks sort to the top
+- Launch readiness score plus a progress breakdown for each area
+- Set a target launch date and see a live countdown
+- Load a starter checklist of 10 common launch tasks in one click
+
 ## Tech stack
 - HTML, CSS, vanilla JavaScript (no build step)
 - `localStorage` for persistence (MVP; a backend is on the roadmap)
@@ -22,10 +30,13 @@ filter by area (Product, Marketing, Legal, Ops).
 
 ## Roadmap
 - [x] Project setup
-- [ ] Add / complete / delete launch tasks
-- [ ] Launch readiness progress bar
-- [ ] Category tags + filtering
-- [ ] Due dates
+- [x] Add / complete / delete launch tasks
+- [x] Launch readiness progress bar
+- [x] Category tags + filtering
+- [x] Due dates with overdue highlighting and smart sorting
+- [x] One-click launch template, inline rename, clear completed
+- [x] Target launch date countdown + per-category progress
+- [ ] Reminders / notifications
 - [ ] Team accounts and shared boards (backend)
 
 ## Contributing

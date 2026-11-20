@@ -76,3 +76,15 @@ button.secondary { background: transparent; color: var(--accent); border: 1px so
 .edit-input { flex: 1; padding: .35rem .5rem; border-radius: 6px; border: 1px solid var(--accent); background: #0b1222; color: var(--text); font-size: 1rem; }
 .hint { font-size: .8rem; margin-bottom: 0; }
 button:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Launch countdown + category stats */
+.launch-date-row { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin: .75rem 0; }
+.launch-date-row input { padding: .4rem .6rem; border-radius: 8px; border: 1px solid #334155; background: #0b1222; color: var(--text); color-scheme: dark; }
+.countdown { font-weight: 600; color: var(--accent); }
+.countdown.late { color: var(--danger); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .6rem; }
+.stat { background: #0b1222; border-radius: 8px; padding: .6rem .75rem; }
+.stat-name { font-size: .8rem; color: var(--muted); }
+.stat-count { font-size: 1.1rem; font-weight: 600; margin: .15rem 0 .35rem; }
+.mini-bar { height: 6px; background: #334155; border-radius: 999px; overflow: hidden; }
+.mini-fill { height: 100%; background: var(--done); }
