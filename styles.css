@@ -63,3 +63,9 @@ button:hover { filter: brightness(1.1); }
 .tag.Marketing { background: #a21caf; }
 .tag.Legal { background: #b45309; }
 .tag.Ops { background: #047857; }
+
+/* Due dates */
+.task-form input[type="date"] { flex: 0 0 auto; color-scheme: dark; }
+.due { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+.due.overdue { color: var(--danger); font-weight: 600; }
+.due.today { color: #facc15; font-weight: 600; }
