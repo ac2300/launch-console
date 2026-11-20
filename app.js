@@ -4,6 +4,7 @@ const STORAGE_KEY = "launch-console-tasks";
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-input");
 const categoryInput = document.getElementById("category-input");
+const dueInput = document.getElementById("due-input");
 const filters = document.getElementById("filters");
 const list = document.getElementById("task-list");
 const emptyState = document.getElementById("empty-state");
@@ -29,8 +30,8 @@ function saveTasks() {
   }
 }
 
-function addTask(title, category) {
-  tasks.push({ id: Date.now().toString(), title, category, done: false });
+function addTask(title, category, due) {
+  tasks.push({ id: Date.now().toString(), title, category, due: due || null, done: false });
   saveTasks();
   render();
 }
@@ -59,12 +60,35 @@ function renderProgress() {
   progressLabel.classList.toggle("ready", ready);
 }
 
+// ---- date helpers ----
+function todayISO() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 10);
+}
+
+function formatDate(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+// Unfinished tasks first, then soonest due date, tasks with no date last
+function sortTasks(list) {
+  return [...list].sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    if (a.due && b.due) return a.due.localeCompare(b.due);
+    if (a.due) return -1;
+    if (b.due) return 1;
+    return 0;
+  });
+}
+
 function render() {
   list.innerHTML = "";
   const visible = activeFilter === "All"
     ? tasks
     : tasks.filter(t => (t.category || "Product") === activeFilter);
-  visible.forEach(task => {
+  sortTasks(visible).forEach(task => {
     const li = document.createElement("li");
     li.className = "task" + (task.done ? " done" : "");
 
@@ -82,13 +106,27 @@ function render() {
     tag.className = "tag " + category;
     tag.textContent = category;
 
+    const due = document.createElement("span");
+    due.className = "due";
+    if (task.due) {
+      const today = todayISO();
+      due.textContent = "Due " + formatDate(task.due);
+      if (!task.done && task.due < today) {
+        due.classList.add("overdue");
+        due.textContent = "Overdue · " + formatDate(task.due);
+      } else if (!task.done && task.due === today) {
+        due.classList.add("today");
+        due.textContent = "Due today";
+      }
+    }
+
     const del = document.createElement("button");
     del.className = "delete-btn";
     del.textContent = "✕";
     del.setAttribute("aria-label", "Delete task");
     del.addEventListener("click", () => deleteTask(task.id));
 
-    li.append(checkbox, title, tag, del);
+    li.append(checkbox, title, tag, due, del);
     list.appendChild(li);
   });
   emptyState.hidden = visible.length > 0;
@@ -102,8 +140,9 @@ form.addEventListener("submit", e => {
   e.preventDefault();
   const title = input.value.trim();
   if (!title) return;
-  addTask(title, categoryInput.value);
+  addTask(title, categoryInput.value, dueInput.value);
   input.value = "";
+  dueInput.value = "";
   input.focus();
 });
 
