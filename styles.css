@@ -69,3 +69,10 @@ button:hover { filter: brightness(1.1); }
 .due { font-size: .8rem; color: var(--muted); white-space: nowrap; }
 .due.overdue { color: var(--danger); font-weight: 600; }
 .due.today { color: #facc15; font-weight: 600; }
+
+/* Toolbar + editing */
+.toolbar { display: flex; gap: .5rem; flex-wrap: wrap; margin: .5rem 0 .75rem; }
+button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); font-size: .9rem; padding: .4rem .8rem; }
+.edit-input { flex: 1; padding: .35rem .5rem; border-radius: 6px; border: 1px solid var(--accent); background: #0b1222; color: var(--text); font-size: 1rem; }
+.hint { font-size: .8rem; margin-bottom: 0; }
+button:disabled { opacity: .4; cursor: not-allowed; }
