@@ -21,11 +21,26 @@
       <h2>Add a launch task</h2>
       <form id="task-form" class="task-form">
         <input id="task-input" type="text" placeholder="e.g. Set up landing page" required maxlength="120" />
+        <select id="category-input" aria-label="Category">
+          <option>Product</option>
+          <option>Marketing</option>
+          <option>Legal</option>
+          <option>Ops</option>
+        </select>
         <button type="submit">Add</button>
       </form>
     </section>
     <section class="card">
-      <h2>Launch tasks</h2>
+      <div class="list-header">
+        <h2>Launch tasks</h2>
+        <div id="filters" class="filters">
+          <button class="chip active" data-filter="All">All</button>
+          <button class="chip" data-filter="Product">Product</button>
+          <button class="chip" data-filter="Marketing">Marketing</button>
+          <button class="chip" data-filter="Legal">Legal</button>
+          <button class="chip" data-filter="Ops">Ops</button>
+        </div>
+      </div>
       <ul id="task-list" class="task-list"></ul>
       <p id="empty-state" class="muted">No tasks yet. Add your first one above.</p>
     </section>
