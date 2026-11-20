@@ -1,5 +1,7 @@
 // Launch Console - app logic
 const STORAGE_KEY = "launch-console-tasks";
+const SETTINGS_KEY = "launch-console-settings";
+const CATEGORIES = ["Product", "Marketing", "Legal", "Ops"];
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-input");
@@ -30,6 +32,25 @@ const LAUNCH_TEMPLATE = [
 
 const templateBtn = document.getElementById("template-btn");
 const clearBtn = document.getElementById("clear-btn");
+const launchDateInput = document.getElementById("launch-date");
+const countdownEl = document.getElementById("countdown");
+const statsEl = document.getElementById("category-stats");
+
+let settings = loadSettings();
+
+function loadSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch {}
+}
 
 function loadTasks() {
   try {
@@ -152,6 +173,49 @@ function sortTasks(list) {
   });
 }
 
+// Whole days between today and the target launch date
+function daysUntil(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const target = new Date(y, m - 1, d);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((target - today) / 86400000);
+}
+
+function renderCountdown() {
+  countdownEl.classList.remove("late");
+  if (!settings.launchDate) {
+    countdownEl.textContent = "";
+    return;
+  }
+  const days = daysUntil(settings.launchDate);
+  const remaining = tasks.filter(t => !t.done).length;
+  if (days > 0) {
+    countdownEl.textContent = `${days} day${days === 1 ? "" : "s"} to launch · ${remaining} task${remaining === 1 ? "" : "s"} left`;
+  } else if (days === 0) {
+    countdownEl.textContent = "Launch day is today!";
+  } else {
+    countdownEl.textContent = `Launch date passed ${-days} day${days === -1 ? "" : "s"} ago`;
+    countdownEl.classList.add("late");
+  }
+}
+
+function renderStats() {
+  statsEl.innerHTML = "";
+  CATEGORIES.forEach(cat => {
+    const inCat = tasks.filter(t => (t.category || "Product") === cat);
+    const done = inCat.filter(t => t.done).length;
+    const pct = inCat.length ? Math.round((done / inCat.length) * 100) : 0;
+    const box = document.createElement("div");
+    box.className = "stat";
+    box.innerHTML = `
+      <div class="stat-name">${cat}</div>
+      <div class="stat-count">${done}/${inCat.length}</div>
+      <div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div>`;
+    statsEl.appendChild(box);
+  });
+}
+
 function render() {
   list.innerHTML = "";
   const visible = activeFilter === "All"
@@ -206,6 +270,8 @@ function render() {
     ? "No tasks yet. Add your first one above."
     : `No ${activeFilter} tasks.`;
   renderProgress();
+  renderStats();
+  renderCountdown();
 }
 
 form.addEventListener("submit", e => {
@@ -224,6 +290,13 @@ filters.addEventListener("click", e => {
   activeFilter = chip.dataset.filter;
   filters.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c === chip));
   render();
+});
+
+launchDateInput.value = settings.launchDate || "";
+launchDateInput.addEventListener("change", () => {
+  settings.launchDate = launchDateInput.value || null;
+  saveSettings();
+  renderCountdown();
 });
 
 templateBtn.addEventListener("click", loadTemplate);
