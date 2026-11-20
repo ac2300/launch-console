@@ -14,6 +14,23 @@ const progressLabel = document.getElementById("progress-label");
 let tasks = loadTasks();
 let activeFilter = "All";
 
+// Common launch tasks most early-stage startups need
+const LAUNCH_TEMPLATE = [
+  { title: "Define MVP feature list", category: "Product" },
+  { title: "Run 5 user interviews", category: "Product" },
+  { title: "Fix top bugs from beta testers", category: "Product" },
+  { title: "Build landing page with waitlist", category: "Marketing" },
+  { title: "Write launch announcement post", category: "Marketing" },
+  { title: "Set up social media accounts", category: "Marketing" },
+  { title: "Draft privacy policy and terms", category: "Legal" },
+  { title: "Register business name / LLC", category: "Legal" },
+  { title: "Set up analytics tracking", category: "Ops" },
+  { title: "Create support email and FAQ", category: "Ops" },
+];
+
+const templateBtn = document.getElementById("template-btn");
+const clearBtn = document.getElementById("clear-btn");
+
 function loadTasks() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -40,6 +57,58 @@ function toggleTask(id) {
   tasks = tasks.map(t => (t.id === id ? { ...t, done: !t.done } : t));
   saveTasks();
   render();
+}
+
+function renameTask(id, newTitle) {
+  const title = newTitle.trim();
+  if (!title) return render(); // empty name -> cancel edit
+  tasks = tasks.map(t => (t.id === id ? { ...t, title } : t));
+  saveTasks();
+  render();
+}
+
+// Adds template tasks, skipping any the team already has
+function loadTemplate() {
+  const existing = new Set(tasks.map(t => t.title.toLowerCase()));
+  let added = 0;
+  LAUNCH_TEMPLATE.forEach((item, i) => {
+    if (existing.has(item.title.toLowerCase())) return;
+    tasks.push({ id: `${Date.now()}-${i}`, title: item.title, category: item.category, due: null, done: false });
+    added++;
+  });
+  saveTasks();
+  render();
+  return added;
+}
+
+function clearCompleted() {
+  const before = tasks.length;
+  tasks = tasks.filter(t => !t.done);
+  saveTasks();
+  render();
+  return before - tasks.length;
+}
+
+function startEditing(li, task) {
+  const titleEl = li.querySelector(".title");
+  const editor = document.createElement("input");
+  editor.className = "edit-input";
+  editor.value = task.title;
+  editor.maxLength = 120;
+  let finished = false;
+  const finish = save => {
+    if (finished) return;
+    finished = true;
+    save ? renameTask(task.id, editor.value) : render();
+  };
+  editor.addEventListener("keydown", e => {
+    if (e.key === "Enter") finish(true);
+    if (e.key === "Escape") finish(false);
+  });
+  editor.addEventListener("blur", () => finish(true));
+  titleEl.replaceWith(editor);
+  editor.focus();
+  editor.select();
 }
 
 function deleteTask(id) {
@@ -100,6 +169,8 @@ function render() {
     const title = document.createElement("span");
     title.className = "title";
     title.textContent = task.title;
+    title.title = "Double-click to rename";
+    title.addEventListener("dblclick", () => startEditing(li, task));
 
     const tag = document.createElement("span");
     const category = task.category || "Product";
@@ -130,6 +201,7 @@ function render() {
     list.appendChild(li);
   });
   emptyState.hidden = visible.length > 0;
+  clearBtn.disabled = !tasks.some(t => t.done);
   emptyState.textContent = tasks.length === 0
     ? "No tasks yet. Add your first one above."
     : `No ${activeFilter} tasks.`;
@@ -153,5 +225,8 @@ filters.addEventListener("click", e => {
   filters.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c === chip));
   render();
 });
+
+templateBtn.addEventListener("click", loadTemplate);
+clearBtn.addEventListener("click", clearCompleted);
 
 render();
